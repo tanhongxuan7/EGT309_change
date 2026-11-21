@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Individual GenAI declarations contain personal details (name, admin no.) - submit via Brightspace, not GitHub
+GenAI_Use_Declaration_*.docx
