@@ -7,11 +7,10 @@
 
 | | |
 |---|---|
-| **Group name** | TODO |
-| **Member 1** | TODO – name |
-| **Member 2** | TODO – name |
-| **Member 3** | TODO – name (if applicable) |
-| **GitHub repository** | TODO – public repo link |
+| **Group Change** | TODO |
+| **Tham Hon Shane** | TODO – name |
+| **Khoo Jayho** | TODO – name |
+| **https://github.com/tanhongxuan7/EGT309_change** | TODO – public repo link |
 
 ### Who wrote which file
 
