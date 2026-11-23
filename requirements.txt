@@ -2,7 +2,7 @@
 # Versions below are the ones eda.ipynb was executed with.
 
 # Data analysis
-numpy==2.5.5
+numpy==2.4.4
 pandas==3.1.1
 scipy==1.18.1
 scikit-learn==1.9.1
