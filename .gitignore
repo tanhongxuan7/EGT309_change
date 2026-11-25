@@ -9,5 +9,8 @@ venv/
 # Jupyter
 .ipynb_checkpoints/
 
+# Generated data preparation outputs
+/data/prepared/
+
 # Individual GenAI declarations contain personal details (name, admin no.) - submit via Brightspace, not GitHub
 GenAI_Use_Declaration_*.docx

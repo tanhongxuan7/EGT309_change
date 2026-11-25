@@ -18,6 +18,9 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+COPY src/ ./src/
+COPY data/proj_machine_readings.csv ./data/
+
 # Expose Jupyter port
 EXPOSE 8888
 

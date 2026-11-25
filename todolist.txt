@@ -7,8 +7,9 @@ Week 6:
 Week 7:
 1. jayho - src file: 
 src or sub-folders – contains .py files that:
-• ingests data
-• Performs data cleaning and feature engineering
+• [x] Ingests data (src/ingest.py)
+• [x] Performs data cleaning and feature engineering (src/features.py)
+• [x] Exports stratified training and test data (src/prepare_data.py)
 
 • Trains models (not yet )
 • Evaluates models (not yet)
