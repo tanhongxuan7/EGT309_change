@@ -1,7 +1,6 @@
 # EGT309 Project – Predictive Maintenance (`maintenance_required`)
 
-> **Status:** Task 1 (EDA) complete. Sections marked **TODO (Task 2)** are to be filled in once the
-> machine-learning pipeline is built.
+> **Status:** Task 1 (EDA) and Week 7 data preparation are complete. Model training and evaluation are pending.
 
 ## 1. Group information
 
@@ -19,8 +18,9 @@ Each member must write at least one `.py` file for the code-quality assessment.
 | File | Author | Description |
 |------|--------|-------------|
 | `eda.ipynb` | TODO | Task 1 exploratory data analysis |
-| `src/...py` | TODO (Task 2) | e.g. data ingestion (SQLite) |
-| `src/...py` | TODO (Task 2) | e.g. data cleaning & feature engineering |
+| `src/ingest.py` | Khoo Jayho (Week 7) | CSV ingestion and validation |
+| `src/features.py` | Khoo Jayho (Week 7) | Data cleaning and feature engineering |
+| `src/prepare_data.py` | Khoo Jayho (Week 7) | Training/test split and CSV export |
 | `src/...py` | TODO (Task 2) | e.g. model training & evaluation |
 
 ## 2. Problem statement (summary)
@@ -39,7 +39,7 @@ contribute most to the target must be identified.
 ├── eda.ipynb                       # Task 1 – exploratory data analysis
 ├── README.md
 ├── requirements.txt                # Python dependencies
-├── src/                            # TODO (Task 2) – pipeline .py files + config
+├── src/                            # Data ingestion, feature engineering and split export
 ├── saved_model/                    # TODO (Task 2) – trained model files
 └── run.sh                          # TODO (Task 2) – runs the pipeline end to end
 ```
@@ -64,12 +64,31 @@ The notebook reads `data/proj_machine_readings.csv` and runs top to bottom in un
 
 ## 5. How to run the pipeline
 
-**TODO (Task 2)** – e.g. `bash run.sh`, plus how to change the configuration (feature set, models,
-hyperparameters).
+After installing the dependencies from section 4, run from the repository root in the VS Code terminal.
+
+```powershell
+python -m src.prepare_data
+```
+
+This reads `data/proj_machine_readings.csv` and writes `train.csv` and `test.csv` under
+`data/prepared/sensor/`. The default split is stratified 80/20 with seed 42. Each output includes
+`maintenance_required` as its final column. Use `--input`, `--output-dir`, `--test-size` or `--seed`
+to override the defaults.
+
+`--feature-set all` writes to `data/prepared/all/` and includes derived columns that leak the target.
+Use it only for comparison. For future model cross-validation, fit `ReadingFeatures` inside the model's
+scikit-learn pipeline on raw training rows so each fold learns its own imputation median.
 
 ## 6. Docker development environment
 
-**TODO (Task 2)** – how to build and start the container (e.g. `docker build ...` / `docker run ...`).
+Build the image from the repository root. Mount the local `data` directory to retain generated CSVs.
+
+```powershell
+docker build -t egt309 .
+docker run --rm --mount "type=bind,source=$($PWD.Path)\data,target=/notebook/data" egt309 python -m src.prepare_data
+```
+
+To start the EDA notebook, run `docker run --rm -p 127.0.0.1:8888:8888 egt309` and open the URL from the container logs.
 
 ## 7. Summary of key EDA findings
 
@@ -104,7 +123,7 @@ Full details, statistics and charts are in [eda.ipynb](eda.ipynb).
    averages as normal operation. A leakage-free model that uses only sensor readings therefore has a recall ceiling
    well below 100%.
 
-## 8. Feature engineering (planned for the pipeline, justified by the EDA)
+## 8. Feature engineering (implemented in the pipeline)
 
 | Feature | Definition | Justification |
 |---------|------------|---------------|
