@@ -1,6 +1,7 @@
 # EGT309 Project – Predictive Maintenance (`maintenance_required`)
 
-> **Status:** Task 1 (EDA) and Week 7 data preparation are complete. Model training and evaluation are pending.
+> **Status:** Task 1 (EDA), data preparation and the model training/evaluation pipeline are complete.
+> Model-choice and metric justifications (sections 9–10) are pending.
 
 ## 1. Group information
 
@@ -21,7 +22,14 @@ Each member must write at least one `.py` file for the code-quality assessment.
 | `src/ingest.py` | Khoo Jayho (Week 7) | CSV ingestion and validation |
 | `src/features.py` | Khoo Jayho (Week 7) | Data cleaning and feature engineering |
 | `src/prepare_data.py` | Khoo Jayho (Week 7) | Training/test split and CSV export |
-| `src/...py` | TODO (Task 2) | e.g. model training & evaluation |
+| `src/config.yaml` | TODO | Hyperparameters, search spaces, paths and evaluation settings |
+| `src/config.py` | TODO | Loads and validates the YAML config; shared command-line options |
+| `src/model_factory.py` | TODO | Builds model pipelines and grid/random searches from the config |
+| `src/artifacts.py` | TODO | Loads the prepared splits; saves and loads trained models |
+| `src/train.py` | TODO | Tunes, trains and saves each configured model |
+| `src/evaluate.py` | TODO | Test-set metrics, confusion matrices and permutation feature importance |
+| `src/plots.py` | TODO | Model-comparison charts |
+| `run.sh` | TODO | Runs the full pipeline end to end |
 
 ## 2. Problem statement (summary)
 
@@ -39,9 +47,20 @@ contribute most to the target must be identified.
 ├── eda.ipynb                       # Task 1 – exploratory data analysis
 ├── README.md
 ├── requirements.txt                # Python dependencies
-├── src/                            # Data ingestion, feature engineering and split export
-├── saved_model/                    # TODO (Task 2) – trained model files
-└── run.sh                          # TODO (Task 2) – runs the pipeline end to end
+├── src/
+│   ├── ingest.py                   # Load and validate the raw CSV
+│   ├── features.py                 # Cleaning and feature engineering
+│   ├── prepare_data.py             # Stratified train/test split -> data/prepared/<feature_set>/
+│   ├── config.yaml                 # Model, tuning, path and evaluation settings
+│   ├── config.py                   # Config loading/validation and shared CLI options
+│   ├── model_factory.py            # Builds pipelines and hyperparameter searches
+│   ├── artifacts.py                # Prepared-data loading, model save/load
+│   ├── train.py                    # Tune, train and save models
+│   ├── evaluate.py                 # Test-set metrics and feature importance
+│   └── plots.py                    # Comparison charts
+├── saved_model/<feature_set>/      # Trained models (.joblib), training_summary.json, config_used.yaml
+├── reports/<feature_set>/          # metrics.csv/json, feature_importance.csv, plots
+└── run.sh                          # Runs the pipeline end to end
 ```
 
 ## 4. How to run the EDA notebook
@@ -76,8 +95,37 @@ This reads `data/proj_machine_readings.csv` and writes `train.csv` and `test.csv
 to override the defaults.
 
 `--feature-set all` writes to `data/prepared/all/` and includes derived columns that leak the target.
-Use it only for comparison. For future model cross-validation, fit `ReadingFeatures` inside the model's
-scikit-learn pipeline on raw training rows so each fold learns its own imputation median.
+Use it only for comparison.
+
+### Train and evaluate the models
+
+```powershell
+python -m src.train       # tune + train every enabled model, save to saved_model/sensor/
+python -m src.evaluate    # score them on the test set, write reports/sensor/
+```
+
+Or run all three steps at once (Git Bash / Linux / Docker): `./run.sh` (or `./run.sh all`).
+
+All settings live in [src/config.yaml](src/config.yaml): fixed hyperparameters (`params`), tuning
+search spaces (`search_space`), tuning method/CV folds/scoring, the decision threshold and the paths.
+Any value can also be changed for one run without editing the file:
+
+```powershell
+python -m src.train --models random_forest                       # train only some models
+python -m src.train --set models.random_forest.params.n_estimators=500
+python -m src.train --set tuning.method=grid --set tuning.cv_folds=3
+python -m src.train --set tuning.enabled=false                   # fixed params only (fast)
+python -m src.evaluate --set evaluation.threshold=0.3            # trade precision for recall
+python -m src.train --config my_experiment.yaml                  # use another config file
+```
+
+To add a model, add an entry under `models:` with the import path of any scikit-learn classifier
+(e.g. `estimator: sklearn.tree.DecisionTreeClassifier`); no code changes are needed. Both scripts
+validate the config before running and stop with a short error message on unknown keys, invalid
+values or missing input files. Run `python -m src.train --help` for every option.
+
+Note: the prepared CSVs already contain imputed temperatures (median from the whole training split),
+so the cross-validation folds share that median. The effect is negligible here (MCAR, 14% missing).
 
 ## 6. Docker development environment
 

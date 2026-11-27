@@ -1,0 +1,86 @@
+seed: 42
+data:
+  feature_set: sensor
+  prepared_dir: data/prepared
+  target: maintenance_required
+output:
+  model_dir: saved_model
+  report_dir: reports
+tuning:
+  enabled: true
+  method: random
+  n_iter: 10
+  cv_folds: 5
+  scoring: average_precision
+  n_jobs: -1
+models:
+  logistic_regression:
+    estimator: sklearn.linear_model.LogisticRegression
+    enabled: true
+    scale_features: true
+    params:
+      class_weight: balanced
+      max_iter: 1000
+    search_space:
+      C:
+      - 0.001
+      - 0.01
+      - 0.1
+      - 1.0
+      - 10.0
+  random_forest:
+    estimator: sklearn.ensemble.RandomForestClassifier
+    enabled: true
+    scale_features: false
+    params:
+      n_estimators: 200
+      class_weight: balanced
+      n_jobs: -1
+    search_space:
+      max_depth:
+      - 6
+      - 10
+      - 16
+      - null
+      min_samples_leaf:
+      - 1
+      - 5
+      - 20
+      - 50
+      max_features:
+      - sqrt
+      - 0.5
+      - 1.0
+  hist_gradient_boosting:
+    estimator: sklearn.ensemble.HistGradientBoostingClassifier
+    enabled: true
+    scale_features: false
+    params:
+      class_weight: balanced
+      max_iter: 300
+      early_stopping: true
+    search_space:
+      learning_rate:
+      - 0.03
+      - 0.1
+      - 0.3
+      max_leaf_nodes:
+      - 15
+      - 31
+      - 63
+      min_samples_leaf:
+      - 20
+      - 50
+      - 100
+      l2_regularization:
+      - 0.0
+      - 1.0
+evaluation:
+  threshold: 0.5
+  primary_metric: recall
+  save_plots: true
+  permutation_importance:
+    enabled: true
+    n_repeats: 5
+    scoring: average_precision
+    max_samples: 5000

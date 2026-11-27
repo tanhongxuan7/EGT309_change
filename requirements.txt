@@ -7,6 +7,10 @@ pandas==3.1.1
 scipy==1.18.1
 scikit-learn==1.9.1
 
+# Model pipeline (src/train.py, src/evaluate.py)
+PyYAML==6.0.4
+joblib==1.6.0
+
 # Visualisation
 matplotlib==3.11.2
 seaborn==0.13.2

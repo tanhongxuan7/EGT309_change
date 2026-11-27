@@ -1,0 +1,73 @@
+[
+  {
+    "name": "logistic_regression",
+    "estimator": "sklearn.linear_model.LogisticRegression",
+    "feature_set": "sensor",
+    "feature_columns": [
+      "temperature",
+      "vibration",
+      "humidity",
+      "pressure",
+      "energy_consumption",
+      "temperature_missing",
+      "temp_above_90",
+      "vibration_above_80"
+    ],
+    "best_params": {
+      "C": 0.001
+    },
+    "cv_scoring": "average_precision",
+    "cv_score": 0.6155486971788114,
+    "training_seconds": 3.68,
+    "trained_at": "2026-11-25T13:47:30+00:00"
+  },
+  {
+    "name": "random_forest",
+    "estimator": "sklearn.ensemble.RandomForestClassifier",
+    "feature_set": "sensor",
+    "feature_columns": [
+      "temperature",
+      "vibration",
+      "humidity",
+      "pressure",
+      "energy_consumption",
+      "temperature_missing",
+      "temp_above_90",
+      "vibration_above_80"
+    ],
+    "best_params": {
+      "min_samples_leaf": 1,
+      "max_features": 0.5,
+      "max_depth": 6
+    },
+    "cv_scoring": "average_precision",
+    "cv_score": 0.6142911350791428,
+    "training_seconds": 63.74,
+    "trained_at": "2026-11-25T13:48:34+00:00"
+  },
+  {
+    "name": "hist_gradient_boosting",
+    "estimator": "sklearn.ensemble.HistGradientBoostingClassifier",
+    "feature_set": "sensor",
+    "feature_columns": [
+      "temperature",
+      "vibration",
+      "humidity",
+      "pressure",
+      "energy_consumption",
+      "temperature_missing",
+      "temp_above_90",
+      "vibration_above_80"
+    ],
+    "best_params": {
+      "min_samples_leaf": 100,
+      "max_leaf_nodes": 31,
+      "learning_rate": 0.03,
+      "l2_regularization": 0.0
+    },
+    "cv_scoring": "average_precision",
+    "cv_score": 0.6127925737061901,
+    "training_seconds": 25.97,
+    "trained_at": "2026-11-25T13:49:00+00:00"
+  }
+]

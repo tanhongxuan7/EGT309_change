@@ -1,0 +1,78 @@
+# Configuration for model training (src/train.py) and evaluation (src/evaluate.py).
+#
+# - Relative paths are resolved from the project root.
+# - Any value can be overridden from the command line without editing this file, e.g.
+#     python -m src.train --set models.random_forest.params.n_estimators=500
+#     python -m src.train --set tuning.enabled=false
+#     python -m src.evaluate --set evaluation.threshold=0.3
+
+seed: 42                              # Used for CV shuffling, random search and model random_state
+
+data:
+  feature_set: sensor                 # "sensor" (leakage-free, main) or "all" (includes leaky derived columns, comparison only)
+  prepared_dir: data/prepared         # Output folder of src.prepare_data (cleaned train.csv / test.csv per feature set)
+  target: maintenance_required
+
+output:
+  model_dir: saved_model              # Trained models are saved to <model_dir>/<feature_set>/<model_name>.joblib
+  report_dir: reports                 # Metrics, feature importance and plots go to <report_dir>/<feature_set>/
+
+# Hyperparameter tuning, applied to every model that has a non-empty search_space.
+tuning:
+  enabled: true
+  method: random                      # "grid" (GridSearchCV) or "random" (RandomizedSearchCV)
+  n_iter: 10                          # Number of sampled candidates (random search only)
+  cv_folds: 5                         # Stratified K-fold, keeps the ~20% positive rate in every fold
+  scoring: average_precision          # PR-AUC: threshold-free and robust to the 4:1 class imbalance
+  n_jobs: -1                          # -1 = use all CPU cores
+
+# Models to train. To add a model, add an entry with the full import path of any scikit-learn
+# compatible classifier. "params" are fixed hyperparameters; "search_space" lists the values tried
+# during tuning (parameter names as in the estimator, no "model__" prefix needed).
+models:
+  logistic_regression:
+    enabled: true
+    estimator: sklearn.linear_model.LogisticRegression
+    scale_features: true              # Standardise features first (needed for regularised linear models)
+    params:
+      class_weight: balanced          # Up-weights the minority "maintenance required" class
+      max_iter: 1000
+    search_space:
+      C: [0.001, 0.01, 0.1, 1.0, 10.0]
+
+  random_forest:
+    enabled: true
+    estimator: sklearn.ensemble.RandomForestClassifier
+    scale_features: false             # Trees are insensitive to feature scale
+    params:
+      n_estimators: 200
+      class_weight: balanced
+      n_jobs: -1
+    search_space:
+      max_depth: [6, 10, 16, null]    # null = grow until leaves are pure
+      min_samples_leaf: [1, 5, 20, 50]
+      max_features: [sqrt, 0.5, 1.0]
+
+  hist_gradient_boosting:
+    enabled: true
+    estimator: sklearn.ensemble.HistGradientBoostingClassifier
+    scale_features: false
+    params:
+      class_weight: balanced
+      max_iter: 300
+      early_stopping: true
+    search_space:
+      learning_rate: [0.03, 0.1, 0.3]
+      max_leaf_nodes: [15, 31, 63]
+      min_samples_leaf: [20, 50, 100]
+      l2_regularization: [0.0, 1.0]
+
+evaluation:
+  threshold: 0.5                      # Probability at or above which a reading is flagged for maintenance
+  primary_metric: recall              # Ranks models in the summary: accuracy, precision, recall, f1, roc_auc or pr_auc
+  save_plots: true
+  permutation_importance:
+    enabled: true
+    n_repeats: 5
+    scoring: average_precision
+    max_samples: 5000                 # Stratified test subsample to keep it fast; null = use the full test set

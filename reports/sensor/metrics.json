@@ -1,0 +1,46 @@
+{
+  "feature_set": "sensor",
+  "threshold": 0.5,
+  "primary_metric": "recall",
+  "results": [
+    {
+      "model": "hist_gradient_boosting",
+      "accuracy": 0.8764,
+      "precision": 0.9194,
+      "recall": 0.4082,
+      "f1": 0.5654,
+      "roc_auc": 0.716,
+      "pr_auc": 0.6068,
+      "tn": 15920,
+      "fp": 141,
+      "fn": 2331,
+      "tp": 1608
+    },
+    {
+      "model": "random_forest",
+      "accuracy": 0.881,
+      "precision": 0.9869,
+      "recall": 0.4014,
+      "f1": 0.5707,
+      "roc_auc": 0.7228,
+      "pr_auc": 0.6109,
+      "tn": 16040,
+      "fp": 21,
+      "fn": 2358,
+      "tp": 1581
+    },
+    {
+      "model": "logistic_regression",
+      "accuracy": 0.8818,
+      "precision": 1.0,
+      "recall": 0.3998,
+      "f1": 0.5713,
+      "roc_auc": 0.7189,
+      "pr_auc": 0.6094,
+      "tn": 16061,
+      "fp": 0,
+      "fn": 2364,
+      "tp": 1575
+    }
+  ]
+}
